@@ -6,7 +6,6 @@ class Sanity
 
   def self.call(quiet=false)
     check = new
-    check.staged_files = Utils.staged_files('*')
 
     result = check.run
     if !quiet && !result
@@ -18,8 +17,6 @@ class Sanity
   end
 
   def run
-    return true if staged_files.empty?
-
     if detected_bad_code?
       @error_message = "pre-commit: detected bad character:\n"
       @error_message += violations
@@ -32,11 +29,11 @@ class Sanity
   BAD_CHARACTER_PATTERN = ' | ' # invisible utf-8 characters...
 
   def detected_bad_code?
-    system "grep -PnIH -q '#{BAD_CHARACTER_PATTERN}' #{staged_files}"
+    system "git grep --cached -EnIH '#{BAD_CHARACTER_PATTERN}' > /dev/null"
   end
 
   def violations
-    `grep -PnIH '#{BAD_CHARACTER_PATTERN}' #{staged_files}`
+    `git grep --cached -EnIH '#{BAD_CHARACTER_PATTERN}'`
   end
 
   def print_dash_n_reminder

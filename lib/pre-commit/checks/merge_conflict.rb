@@ -4,7 +4,6 @@ class MergeConflict
 
   def self.call
     check = new
-    check.staged_files = Utils.staged_files('.')
     check.run
   end
 
@@ -22,11 +21,11 @@ class MergeConflict
   end
 
   def detected_bad_code?
-    system("grep '<<<<<<<' #{staged_files} --quiet")
+    system("git grep --cached '<<<<<<<' > /dev/null")
   end
 
   def errors
-    `grep -nH '<<<<<<<' #{staged_files}`
+    `grep grep --cached -nH '<<<<<<<'`
   end
 
 end
